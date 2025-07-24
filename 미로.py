@@ -1,23 +1,54 @@
 import streamlit as st
 
-# 미로 설정
-MAZE = [
-    [0, 1, 0, 0, 0],
-    [0, 1, 0, 1, 0],
-    [0, 0, 0, 1, 0],
-    [1, 1, 0, 1, 0],
-    [0, 0, 0, 0, 0],
+# 단계별 미로 설정 (0 = 길, 1 = 벽)
+MAZES = [
+    [  # Stage 1: 5x5
+        [0, 1, 0, 0, 0],
+        [0, 1, 0, 1, 0],
+        [0, 0, 0, 1, 0],
+        [1, 1, 0, 1, 0],
+        [0, 0, 0, 0, 0],
+    ],
+    [  # Stage 2: 7x7
+        [0, 1, 0, 0, 1, 0, 0],
+        [0, 1, 0, 1, 1, 0, 1],
+        [0, 0, 0, 0, 0, 0, 1],
+        [1, 1, 1, 1, 1, 0, 0],
+        [0, 0, 0, 0, 1, 0, 1],
+        [0, 1, 1, 0, 0, 0, 1],
+        [0, 0, 0, 0, 1, 0, 0],
+    ],
+    [  # Stage 3: 9x9 (더 어렵게)
+        [0, 1, 0, 0, 0, 1, 0, 1, 0],
+        [0, 1, 0, 1, 0, 1, 0, 1, 0],
+        [0, 0, 0, 1, 0, 0, 0, 1, 0],
+        [1, 1, 0, 1, 1, 1, 0, 1, 0],
+        [0, 0, 0, 0, 0, 1, 0, 0, 0],
+        [0, 1, 1, 1, 0, 1, 1, 1, 1],
+        [0, 1, 0, 0, 0, 0, 0, 0, 0],
+        [0, 1, 0, 1, 1, 1, 1, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0, 1, 0],
+    ],
 ]
 
 START = (0, 0)
-GOAL = (4, 4)
 WALL = 1
+MAX_STAGE = len(MAZES)
 
-# 세션 상태 초기화
+# 상태 초기화
+if "stage" not in st.session_state:
+    st.session_state.stage = 0
 if "player_pos" not in st.session_state:
     st.session_state.player_pos = START
 if "win" not in st.session_state:
     st.session_state.win = False
+
+# 현재 미로
+stage = st.session_state.stage
+maze = MAZES[stage]
+height = len(maze)
+width = len(maze[0])
+GOAL = (width - 1, height - 1)
 
 # 이동 함수
 def move(dx, dy):
@@ -25,21 +56,21 @@ def move(dx, dy):
         return
     x, y = st.session_state.player_pos
     nx, ny = x + dx, y + dy
-    if 0 <= nx < 5 and 0 <= ny < 5 and MAZE[ny][nx] != WALL:
+    if 0 <= nx < width and 0 <= ny < height and maze[ny][nx] != WALL:
         st.session_state.player_pos = (nx, ny)
     if st.session_state.player_pos == GOAL:
         st.session_state.win = True
 
-# 제목
-st.title("🧩 미로 탈출 게임")
+# UI 출력
+st.title(f"🧭 미로 탈출 게임 - 스테이지 {stage + 1}")
 st.markdown("**⬛ = 벽 / ⬜ = 길 / 🔵 = 나 / 🏁 = 목표**")
 
-# 미로 출력
-for y in range(5):
-    cols = st.columns(5)
-    for x in range(5):
+# 미로 시각화
+for y in range(height):
+    cols = st.columns(width)
+    for x in range(width):
         cell = "⬜"
-        if MAZE[y][x] == WALL:
+        if maze[y][x] == WALL:
             cell = "⬛"
         if (x, y) == st.session_state.player_pos:
             cell = "🔵"
@@ -47,7 +78,7 @@ for y in range(5):
             cell = "🏁" if (x, y) != st.session_state.player_pos else "🎉"
         cols[x].markdown(f"<div style='text-align:center; font-size:30px'>{cell}</div>", unsafe_allow_html=True)
 
-# 이동 버튼
+# 이동 버튼 UI
 st.markdown("### 🔀 이동")
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
@@ -60,11 +91,19 @@ with col2:
 with col3:
     if st.button("➡️ 오른쪽"): move(1, 0)
 
-# 상태 메시지
+# 성공 시 다음 단계로
 if st.session_state.win:
-    st.success("🎉 축하합니다! 미로를 탈출했어요!")
+    if stage + 1 < MAX_STAGE:
+        st.success("🎉 탈출 성공! 다음 스테이지로 이동합니다.")
+        if st.button("➡️ 다음 스테이지"):
+            st.session_state.stage += 1
+            st.session_state.player_pos = START
+            st.session_state.win = False
+            st.experimental_rerun()
+    else:
+        st.success("🏆 모든 스테이지를 클리어했습니다! 게임 끝!")
 
-# 초기화 버튼
-if st.button("🔄 다시 시작"):
+# 다시 시작 버튼
+if st.button("🔄 현재 스테이지 다시 시작"):
     st.session_state.player_pos = START
     st.session_state.win = False
