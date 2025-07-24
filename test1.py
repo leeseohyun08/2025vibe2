@@ -22,17 +22,17 @@ st.subheader("📋 할 일 목록")
 # 할 일 목록 표시
 if st.session_state.todos:
     for i, todo in enumerate(st.session_state.todos):
-        cols = st.columns([0.1, 0.5, 0.1, 0.1, 0.2])
+        cols = st.columns([0.05, 0.65, 0.05, 0.1, 0.15])  # 열 비율 조정: 수정 아이콘 오른쪽으로
 
         # 체크박스
         done = cols[0].checkbox("", value=todo["done"], key=f"done_{i}")
         st.session_state.todos[i]["done"] = done
 
-        # 수정 중이면 입력창 보여주기
+        # 수정 중이면 입력창 표시
         if st.session_state.edit_index == i:
             with cols[1]:
                 updated_text = st.text_input("수정할 내용을 입력하세요", value=todo["task"], key=f"edit_input_{i}")
-            if cols[2].button("💾 저장", key=f"save_{i}"):
+            if cols[3].button("💾 저장", key=f"save_{i}"):
                 if updated_text.strip():
                     st.session_state.todos[i]["task"] = updated_text.strip()
                 st.session_state.edit_index = None
@@ -41,8 +41,8 @@ if st.session_state.todos:
             task_display = f"~~{todo['task']}~~" if done else todo["task"]
             cols[1].markdown(task_display)
 
-            # ✏️ 수정 버튼
-            if cols[2].button("✏️", key=f"edit_{i}"):
+            # ✏️ 수정 버튼 (오른쪽으로 이동)
+            if cols[3].button("✏️", key=f"edit_{i}"):
                 st.session_state.edit_index = i
 
         # 🗑 삭제 버튼
@@ -53,7 +53,7 @@ if st.session_state.todos:
 else:
     st.info("할 일을 추가해보세요!")
 
-# 전체 삭제
+# 전체 삭제 버튼
 st.markdown("---")
 if st.button("❌ 전체 삭제"):
     st.session_state.todos.clear()
