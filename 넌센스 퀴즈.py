@@ -35,21 +35,32 @@ st.subheader(f"문제: {quiz['question']}")
 user_answer = st.text_input("정답을 입력하세요", value=st.session_state["user_input"])
 st.session_state["user_input"] = user_answer.strip()
 
-# -------------------- 제출 --------------------
-if st.button("제출"):
-    if st.session_state["user_input"]:
-        if st.session_state["user_input"] == quiz["answer"]:
-            st.session_state["correct"] = True
-        else:
-            st.session_state["correct"] = False
+# -------------------- 버튼 처리 --------------------
+col1, col2, col3, col4 = st.columns(4)
 
-# -------------------- 힌트 보기 --------------------
-if st.button("힌트 보기"):
-    st.session_state["show_hint"] = True
+with col1:
+    if st.button("제출", key="submit"):
+        if st.session_state["user_input"]:
+            if st.session_state["user_input"] == quiz["answer"]:
+                st.session_state["correct"] = True
+            else:
+                st.session_state["correct"] = False
 
-# -------------------- 정답 보기 --------------------
-if st.button("정답 보기"):
-    st.session_state["show_answer"] = True
+with col2:
+    if st.button("힌트 보기", key="hint"):
+        st.session_state["show_hint"] = True
+
+with col3:
+    if st.button("정답 보기", key="answer"):
+        st.session_state["show_answer"] = True
+
+with col4:
+    if st.button("다음 문제", key="next"):
+        st.session_state["quiz"] = random.choice(quizzes)
+        st.session_state["correct"] = None
+        st.session_state["show_hint"] = False
+        st.session_state["show_answer"] = False
+        st.session_state["user_input"] = ""
 
 # -------------------- 결과 표시 --------------------
 if st.session_state["correct"] is True:
@@ -64,11 +75,3 @@ if st.session_state["show_hint"]:
 # -------------------- 정답 출력 --------------------
 if st.session_state["show_answer"]:
     st.info(f"✅ 정답: {quiz['answer']}")
-
-# -------------------- 다음 문제 --------------------
-if st.button("다음 문제"):
-    st.session_state["quiz"] = random.choice(quizzes)
-    st.session_state["correct"] = None
-    st.session_state["show_hint"] = False
-    st.session_state["show_answer"] = False
-    st.session_state["user_input"] = ""
