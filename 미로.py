@@ -5,7 +5,6 @@ import random
 # 무작위 미로 생성 함수
 # ---------------------
 def generate_maze(size):
-    # size는 홀수여야 함
     maze = [[1 for _ in range(size)] for _ in range(size)]
     start = (1, 1)
 
@@ -22,9 +21,22 @@ def generate_maze(size):
     maze[start[1]][start[0]] = 0
     dfs(*start)
 
-    # 출발점과 도착점 열어두기
+    # 출발점(0,0) 주변 열어주기
     maze[0][0] = 0
-    maze[size - 1][size - 1] = 0
+    if size > 2:
+        if maze[0][1] == 1:
+            maze[0][1] = 0
+        elif maze[1][0] == 1:
+            maze[1][0] = 0
+
+    # 도착점(size-1,size-1) 주변 열어주기
+    gx, gy = size - 1, size - 1
+    maze[gy][gx] = 0
+    if maze[gy][gx - 1] == 1:
+        maze[gy][gx - 1] = 0
+    elif maze[gy - 1][gx] == 1:
+        maze[gy - 1][gx] = 0
+
     return maze
 
 # ---------------------
@@ -73,13 +85,10 @@ for y in range(height):
         if (x, y) == st.session_state.player_pos:
             cell = "🔵"
         if (x, y) == (width - 1, height - 1):
-            if st.session_state.player_pos == (x, y):
-                cell = "🎉"
-            else:
-                cell = "🏁"
+            cell = "🎉" if (x, y) == st.session_state.player_pos else "🏁"
         cols[x].markdown(f"<div style='text-align:center; font-size:30px'>{cell}</div>", unsafe_allow_html=True)
 
-# 이동 버튼 - 키보드 방향키 스타일
+# 🔀 이동 버튼 (키보드 방향키 형태)
 st.markdown("### 🔀 이동")
 top = st.columns(3)
 with top[1]:
@@ -92,20 +101,17 @@ with mid[1]:
 with mid[2]:
     if st.button("➡️ 오른쪽"): move(1, 0)
 
-# ---------------------
-# 성공 시 다음 스테이지로
-# ---------------------
+# ✅ 클리어 시 다음 스테이지로
 if st.session_state.win:
     st.success("🎉 탈출 성공! 새로운 미로로 이동하세요.")
     if st.button("➡️ 다음 스테이지"):
         st.session_state.stage += 1
-        st.session_state.maze = generate_maze(5 + 2 * st.session_state.stage)  # 점점 커짐 (7x7, 9x9, ...)
+        new_size = 5 + 2 * st.session_state.stage  # 홀수 크기 증가
+        st.session_state.maze = generate_maze(new_size)
         st.session_state.player_pos = (0, 0)
         st.session_state.win = False
 
-# ---------------------
-# 다시 시작
-# ---------------------
+# 🔁 다시 시작
 if st.button("🔄 현재 미로 다시 시작"):
     size = len(st.session_state.maze)
     st.session_state.maze = generate_maze(size)
