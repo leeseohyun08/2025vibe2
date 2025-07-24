@@ -16,18 +16,18 @@ quizzes = [
 ]
 
 # -------------------- 세션 상태 초기화 --------------------
-if "quiz" not in st.session_state:
-    st.session_state["quiz"] = random.choice(quizzes)
-if "show_hint" not in st.session_state:
-    st.session_state["show_hint"] = False
-if "show_answer" not in st.session_state:
-    st.session_state["show_answer"] = False
-if "correct" not in st.session_state:
-    st.session_state["correct"] = None
-if "user_input" not in st.session_state:
-    st.session_state["user_input"] = ""
-if "score" not in st.session_state:
-    st.session_state["score"] = 0  # ✅ 점수 초기화
+defaults = {
+    "quiz": random.choice(quizzes),
+    "show_hint": False,
+    "show_answer": False,
+    "correct": None,
+    "user_input": "",
+    "score": 0
+}
+
+for key, val in defaults.items():
+    if key not in st.session_state:
+        st.session_state[key] = val
 
 # -------------------- 오른쪽 상단 점수 표시 --------------------
 st.markdown(
@@ -51,7 +51,6 @@ with col1:
     if st.button("제출", key="submit"):
         if st.session_state["user_input"]:
             if st.session_state["user_input"] == quiz["answer"]:
-                # 정답 맞추면 한 번만 점수 추가
                 if st.session_state["correct"] is not True:
                     st.session_state["score"] += 1
                 st.session_state["correct"] = True
@@ -64,7 +63,7 @@ with col2:
 
 with col3:
     if st.button("정답 보기", key="answer"):
-        st.session_state["show_answer"] = True
+        st.session_state["show_answer"] = True  # ✅ 여기서 문제 바꾸지 않음
 
 with col4:
     if st.button("다음 문제", key="next"):
@@ -74,7 +73,7 @@ with col4:
         st.session_state["show_answer"] = False
         st.session_state["user_input"] = ""
 
-# -------------------- 결과 표시 --------------------
+# -------------------- 결과 출력 --------------------
 if st.session_state["correct"] is True:
     st.success("🎉 정답입니다! 센스 최고예요!")
 elif st.session_state["correct"] is False:
