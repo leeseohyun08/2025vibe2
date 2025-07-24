@@ -41,11 +41,11 @@ if not game_over:
     user_choice = st.radio("무엇을 낼까요?", list(options.keys()), horizontal=True)
 
     if st.button("대결하기!"):
-        # 카운트다운 애니메이션
+        # ⏳ 카운트다운 (느리게, 묵찌빠 없이)
         with st.empty():
-            for i in ["3", "2", "1", "묵! ✊", "찌! ✌️", "빠! ✋"]:
+            for i in ["3", "2", "1"]:
                 st.markdown(f"<h1 style='text-align: center;'>{i}</h1>", unsafe_allow_html=True)
-                time.sleep(0.4)
+                time.sleep(0.8)
 
         # 컴퓨터 선택
         computer_choice = random.choice(list(options.keys()))
