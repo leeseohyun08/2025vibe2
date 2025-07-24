@@ -1,6 +1,6 @@
 import streamlit as st
 
-# 단계별 미로 설정 (0 = 길, 1 = 벽)
+# 단계별 미로 설정
 MAZES = [
     [  # Stage 1: 5x5
         [0, 1, 0, 0, 0],
@@ -18,7 +18,7 @@ MAZES = [
         [0, 1, 1, 0, 0, 0, 1],
         [0, 0, 0, 0, 1, 0, 0],
     ],
-    [  # Stage 3: 9x9 (더 어렵게)
+    [  # Stage 3: 9x9
         [0, 1, 0, 0, 0, 1, 0, 1, 0],
         [0, 1, 0, 1, 0, 1, 0, 1, 0],
         [0, 0, 0, 1, 0, 0, 0, 1, 0],
@@ -43,7 +43,7 @@ if "player_pos" not in st.session_state:
 if "win" not in st.session_state:
     st.session_state.win = False
 
-# 현재 미로
+# 현재 상태 불러오기
 stage = st.session_state.stage
 maze = MAZES[stage]
 height = len(maze)
@@ -61,11 +61,11 @@ def move(dx, dy):
     if st.session_state.player_pos == GOAL:
         st.session_state.win = True
 
-# UI 출력
-st.title(f"🧭 미로 탈출 게임 - 스테이지 {stage + 1}")
-st.markdown("**⬛ = 벽 / ⬜ = 길 / 🔵 = 나 / 🏁 = 목표**")
+# 타이틀
+st.title(f"🧩 미로 탈출 게임 - 스테이지 {stage + 1}")
+st.markdown("⬛ = 벽 / ⬜ = 길 / 🔵 = 나 / 🏁 = 목표")
 
-# 미로 시각화
+# 미로 그리기
 for y in range(height):
     cols = st.columns(width)
     for x in range(width):
@@ -75,10 +75,13 @@ for y in range(height):
         if (x, y) == st.session_state.player_pos:
             cell = "🔵"
         if (x, y) == GOAL:
-            cell = "🏁" if (x, y) != st.session_state.player_pos else "🎉"
+            if st.session_state.player_pos == GOAL:
+                cell = "🎉"
+            else:
+                cell = "🏁"
         cols[x].markdown(f"<div style='text-align:center; font-size:30px'>{cell}</div>", unsafe_allow_html=True)
 
-# 이동 버튼 UI
+# 이동 버튼
 st.markdown("### 🔀 이동")
 col1, col2, col3 = st.columns([1, 2, 1])
 with col2:
@@ -91,19 +94,18 @@ with col2:
 with col3:
     if st.button("➡️ 오른쪽"): move(1, 0)
 
-# 성공 시 다음 단계로
+# 클리어 상태
 if st.session_state.win:
     if stage + 1 < MAX_STAGE:
-        st.success("🎉 탈출 성공! 다음 스테이지로 이동합니다.")
+        st.success("🎉 탈출 성공! 다음 스테이지로 이동하세요.")
         if st.button("➡️ 다음 스테이지"):
             st.session_state.stage += 1
             st.session_state.player_pos = START
             st.session_state.win = False
-            st.experimental_rerun()
     else:
-        st.success("🏆 모든 스테이지를 클리어했습니다! 게임 끝!")
+        st.success("🏆 모든 스테이지를 클리어했습니다! 축하합니다!")
 
-# 다시 시작 버튼
+# 다시 시작
 if st.button("🔄 현재 스테이지 다시 시작"):
     st.session_state.player_pos = START
     st.session_state.win = False
