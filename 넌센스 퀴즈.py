@@ -19,7 +19,7 @@ quizzes = [
     {"question": "공이 웃으면?", "answer": "풋볼", "hint": "풋(웃음) + 볼"},
     {"question": "깜짝 놀란 소는?", "answer": "오우", "hint": "소 = 우, 놀람 = 오"},
     {"question": "하늘에서 내리는 돈은?", "answer": "월급", "hint": "하늘(회사)에서 떨어짐"},
-    {"question": "먹으면 죽는 음식은?", "answer": "죽", "hint": "농담이지만 말장난"},
+    {"question": "먹으면 죽는 음식은?", "answer": "죽", "hint": "말장난"},
     {"question": "땅은 영어로 So, 물은?", "answer": "물소", "hint": "소 + 물"},
     {"question": "도둑이 가장 싫어하는 아이스크림은?", "answer": "누가바", "hint": "누가 봤다고 싫어함"},
     {"question": "피자가 웃으면?", "answer": "피식", "hint": "피자 + 식"},
@@ -55,32 +55,37 @@ st.markdown(
 quiz = st.session_state["quiz"]
 st.subheader(f"문제: {quiz['question']}")
 
-# -------------------- 입력창 --------------------
-user_answer = st.text_input("정답을 입력하세요", value=st.session_state["user_input"])
-st.session_state["user_input"] = user_answer.strip()
+# -------------------- 정답 입력 (엔터로 제출 + 입력창 초기화) --------------------
+with st.form(key="answer_form"):
+    user_answer = st.text_input("정답을 입력하세요", value=st.session_state["user_input"])
+    submit_enter = st.form_submit_button("엔터로 제출")
 
-# -------------------- 버튼 처리 --------------------
-col1, col2, col3, col4 = st.columns(4)
+    if submit_enter:
+        user_input_cleaned = user_answer.strip()
 
-with col1:
-    if st.button("제출", key="submit"):
-        if st.session_state["user_input"]:
-            if st.session_state["user_input"] == quiz["answer"]:
+        if user_input_cleaned:
+            if user_input_cleaned == quiz["answer"]:
                 if st.session_state["correct"] is not True:
                     st.session_state["score"] += 1
                 st.session_state["correct"] = True
             else:
                 st.session_state["correct"] = False
 
-with col2:
+        # ✅ 입력창 초기화
+        st.session_state["user_input"] = ""
+
+# -------------------- 버튼 처리 --------------------
+col1, col2, col3 = st.columns(3)
+
+with col1:
     if st.button("힌트 보기", key="hint"):
         st.session_state["show_hint"] = True
 
-with col3:
+with col2:
     if st.button("정답 보기", key="answer"):
         st.session_state["show_answer"] = True
 
-with col4:
+with col3:
     if st.button("다음 문제", key="next"):
         current_question = st.session_state["quiz"]["question"]
         other_quizzes = [q for q in quizzes if q["question"] != current_question]
