@@ -8,7 +8,7 @@ st.set_page_config(page_title="가위바위보 게임", layout="centered")
 st.title("✊✋✌️ 가위바위보 게임")
 st.write("먼저 2번 이기면 승리! 컴퓨터와 한판 붙어보자!")
 
-# 가위바위보 이모지 매핑
+# 이모지 매핑
 options = {
     "가위": "✌️",
     "바위": "✊",
@@ -38,18 +38,18 @@ if st.button("🔄 게임 리셋"):
 
 # 게임 진행
 if not game_over:
-    # 사용자 선택
     user_choice = st.radio("무엇을 낼까요?", list(options.keys()), horizontal=True)
 
-    # 대결 버튼
     if st.button("대결하기!"):
-        # ⏳ 카운트다운 애니메이션 (느리게, 묵찌빠 없음)
-        with st.empty():
+        # 카운트다운 + "가위바위보!" 메시지
+        with st.empty() as countdown_area:
             for count in ["3", "2", "1"]:
-                st.markdown(f"<h1 style='text-align: center;'>{count}</h1>", unsafe_allow_html=True)
+                countdown_area.markdown(f"<h1 style='text-align: center;'>{count}</h1>", unsafe_allow_html=True)
                 time.sleep(0.8)
+            countdown_area.markdown(f"<h1 style='text-align: center;'>가위바위보!</h1>", unsafe_allow_html=True)
+            time.sleep(0.8)
 
-        # 컴퓨터 무작위 선택
+        # 컴퓨터 선택
         computer_choice = random.choice(list(options.keys()))
 
         # 결과 판정
@@ -91,7 +91,7 @@ if not game_over:
         st.markdown("---")
         st.markdown(f"<h2 style='text-align: center;'>{result_emoji} {result_text}</h2>", unsafe_allow_html=True)
 
-# 최종 승자 출력
+# 최종 결과 출력
 if st.session_state.wins == 2:
     st.session_state.final_result = "🎉 당신이 최종 승자입니다!"
 elif st.session_state.losses == 2:
@@ -101,7 +101,7 @@ if st.session_state.final_result:
     st.markdown("---")
     st.markdown(f"<h1 style='text-align: center; color: green;'>{st.session_state.final_result}</h1>", unsafe_allow_html=True)
 
-# 점수판 출력
+# 점수판
 st.markdown("---")
 st.markdown(f"""
 ### 🔢 현재 점수
