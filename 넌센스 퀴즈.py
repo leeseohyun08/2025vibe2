@@ -63,11 +63,20 @@ with col2:
 
 with col3:
     if st.button("정답 보기", key="answer"):
-        st.session_state["show_answer"] = True  # ✅ 여기서 문제 바꾸지 않음
+        st.session_state["show_answer"] = True
 
 with col4:
     if st.button("다음 문제", key="next"):
-        st.session_state["quiz"] = random.choice(quizzes)
+        # ✅ 이전 문제와 다른 문제만 선택되도록 필터링
+        current_question = st.session_state["quiz"]["question"]
+        other_quizzes = [q for q in quizzes if q["question"] != current_question]
+
+        # 문제 수가 1개인 경우 예외 처리
+        if other_quizzes:
+            st.session_state["quiz"] = random.choice(other_quizzes)
+        else:
+            st.info("📌 더 이상 새로운 문제가 없어요!")
+
         st.session_state["correct"] = None
         st.session_state["show_hint"] = False
         st.session_state["show_answer"] = False
