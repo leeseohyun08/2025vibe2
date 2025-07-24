@@ -7,7 +7,7 @@ st.set_page_config(page_title="가위바위보 게임", layout="centered")
 st.title("✊✋✌️ 가위바위보 게임")
 st.write("컴퓨터와 한판 대결!")
 
-# 선택지와 이모지 매핑
+# 선택지 및 이모지 매핑
 options = {
     "가위": "✌️",
     "바위": "✊",
@@ -31,13 +31,11 @@ if st.button("대결하기!"):
         result_emoji = "🎉"
         result_text = "이겼습니다!"
     else:
-        result_emoji = "💻"
+        result_emoji = "😢"
         result_text = "졌습니다!"
 
-    # 구분선
+    # 결과 시각화
     st.markdown("---")
-
-    # 나와 컴퓨터 선택 표시
     col1, col2 = st.columns(2)
 
     with col1:
