@@ -26,6 +26,15 @@ if "correct" not in st.session_state:
     st.session_state["correct"] = None
 if "user_input" not in st.session_state:
     st.session_state["user_input"] = ""
+if "score" not in st.session_state:
+    st.session_state["score"] = 0  # ✅ 점수 초기화
+
+# -------------------- 오른쪽 상단 점수 표시 --------------------
+st.markdown(
+    f"<div style='position: absolute; top: 20px; right: 30px; font-size: 18px; color: gray;'>"
+    f"🏅 점수: {st.session_state['score']}개</div>",
+    unsafe_allow_html=True
+)
 
 # -------------------- 현재 퀴즈 출력 --------------------
 quiz = st.session_state["quiz"]
@@ -42,6 +51,9 @@ with col1:
     if st.button("제출", key="submit"):
         if st.session_state["user_input"]:
             if st.session_state["user_input"] == quiz["answer"]:
+                # 정답 맞추면 한 번만 점수 추가
+                if st.session_state["correct"] is not True:
+                    st.session_state["score"] += 1
                 st.session_state["correct"] = True
             else:
                 st.session_state["correct"] = False
